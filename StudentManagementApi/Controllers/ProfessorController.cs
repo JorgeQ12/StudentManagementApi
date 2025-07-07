@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Professor;
+﻿using Application.DTOs.Common;
+using Application.DTOs.Professor;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,34 +18,30 @@ public class ProfessorController : ControllerBase
     }
 
     /// <summary>
-    /// Lista todos los profesores registrados
+    /// Lista todos los profesores registrados - Panel Admin
     /// </summary>
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [Route(nameof(GetAllProfessors))]
-    public async Task<IEnumerable<ProfessorResponseDTO>> GetAllProfessors() => await _professorService.GetAllProfessorsAsync();
+    public async Task<ResultRequestDTO<IEnumerable<ProfessorResponseDTO>>> GetAllProfessors() => await _professorService.GetAllProfessorsAsync();
 
     /// <summary>
-    /// Obtiene un profesor por su ID
+    /// Crea un nuevo profesor - Panel Admin
     /// </summary>
-    [HttpGet]
-    [Authorize]
-    [Route(nameof(GetProfessorById))]
-    public async Task<ProfessorResponseDTO?> GetProfessorById(Guid professorId) => await _professorService.GetProfessorByIdAsync(professorId);
-
-    /// <summary>
-    /// Crea un nuevo profesor
-    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost]
     [Authorize(Roles = "Admin")] 
     [Route(nameof(CreateProfessor))]
-    public async Task CreateProfessor(CreateProfessorRequestDTO request) => await _professorService.CreateProfessorAsync(request);
+    public async Task<ResultRequestDTO<string>> CreateProfessor(CreateProfessorRequestDTO request) => await _professorService.CreateProfessorAsync(request);
 
     /// <summary>
-    /// Elimina un profesor por su ID
+    /// Elimina un profesor por su ID - Panel Admin
     /// </summary>
+    /// <param name="professorId"></param>
+    /// <returns></returns>
     [HttpDelete]
     [Authorize(Roles = "Admin")]
     [Route(nameof(DeleteProfessor))]
-    public async Task DeleteProfessor(Guid professorId) => await _professorService.DeleteProfessorAsync(professorId);
+    public async Task<ResultRequestDTO<string>> DeleteProfessor(Guid professorId) => await _professorService.DeleteProfessorAsync(professorId);
 }

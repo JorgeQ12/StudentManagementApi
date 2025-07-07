@@ -1,27 +1,27 @@
-﻿using Application.DTOs.Professor;
+﻿using Application.DTOs.Common;
+using Application.DTOs.Professor;
 
 namespace Application.Interfaces.IServices
 {
     public interface IProfessorService
     {
         /// <summary>
-        /// Lista todos los profesores
+        /// Lista todos los profesores registrados - Panel Admin
         /// </summary>
-        Task<IEnumerable<ProfessorResponseDTO>> GetAllProfessorsAsync();
+        Task<ResultRequestDTO<IEnumerable<ProfessorResponseDTO>>> GetAllProfessorsAsync();
 
         /// <summary>
-        /// Obtiene un profesor por ID
+        /// Crea un nuevo profesor - Panel Admin
         /// </summary>
-        Task<ProfessorResponseDTO?> GetProfessorByIdAsync(Guid professorId);
+        /// <param name="request"></param>
+        /// <returns></returns>
+        Task<ResultRequestDTO<string>> CreateProfessorAsync(CreateProfessorRequestDTO request);
 
         /// <summary>
-        /// Crea un nuevo profesor
+        /// Elimina un profesor por su ID - Panel Admin
         /// </summary>
-        Task CreateProfessorAsync(CreateProfessorRequestDTO request);
-
-        /// <summary>
-        /// Elimina un profesor por ID
-        /// </summary>
-        Task DeleteProfessorAsync(Guid professorId);
+        /// <param name="professorId"></param>
+        /// <returns></returns>
+        Task<ResultRequestDTO<string>> DeleteProfessorAsync(Guid professorId);
     }
 }

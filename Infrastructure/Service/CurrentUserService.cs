@@ -22,6 +22,12 @@ public class CurrentUserService : ICurrentUserService
         }
     }
 
-    public string? Role => _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
-    public bool IsInRole(string role) => string.Equals(Role, role, StringComparison.OrdinalIgnoreCase);
+    public Guid StudentId
+    {
+        get
+        {
+            var studentIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst("studentId")?.Value;
+            return Guid.TryParse(studentIdClaim, out var id) ? id : Guid.Empty;
+        }
+    }
 }

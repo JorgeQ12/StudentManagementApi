@@ -17,6 +17,9 @@ using Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using StudentManagementApi.Middleware;
+using System.Text.Json;
+using Infrastructure.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +34,8 @@ StatementBuilderMapper.Add<SqlConnection>(new SqlServerStatementBuilder(dbSettin
 #endregion
 
 #region Inyeccion de dependencias
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddDomainConverters();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 
@@ -111,6 +115,8 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; 
     });
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

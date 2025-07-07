@@ -1,4 +1,6 @@
-﻿using Application.DTOs.Subject;
+﻿using Application.DTOs.Common;
+using Application.DTOs.Student;
+using Application.DTOs.Subject;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,34 +19,31 @@ public class SubjectController : ControllerBase
     }
 
     /// <summary>
-    /// Trae todas las materias registradas
+    /// Trae todas las materias registradas - Panel Admin y Estudiante
     /// </summary>
+    /// <returns></returns>
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "Admin, Student")]
     [Route(nameof(GetAllSubjects))]
-    public async Task<IEnumerable<SubjectResponseDTO>> GetAllSubjects() => await _subjectService.GetAllSubjectsAsync();
+    public async Task<ResultRequestDTO<IEnumerable<SubjectWithProfessorDTO>>> GetAllSubjects() => await _subjectService.GetAllSubjectsAsync();
 
     /// <summary>
-    /// Trae una materia por su ID
+    /// Registra una nueva materia - Panel Admin
     /// </summary>
-    [HttpGet]
-    [Authorize]
-    [Route(nameof(GetSubjectById))]
-    public async Task<SubjectResponseDTO?> GetSubjectById(Guid subjectId) => await _subjectService.GetSubjectByIdAsync(subjectId);
-
-    /// <summary>
-    /// Registra una nueva materia
-    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [Route(nameof(CreateSubject))]
-    public async Task CreateSubject(CreateSubjectRequestDTO request) => await _subjectService.CreateSubjectAsync(request);
+    public async Task<ResultRequestDTO<string>> CreateSubject(CreateSubjectRequestDTO request) => await _subjectService.CreateSubjectAsync(request);
 
     /// <summary>
-    /// Elimina una materia por su ID
+    /// Elimina una materia por su ID - Panel Admin
     /// </summary>
+    /// <param name="subjectId"></param>
+    /// <returns></returns>
     [HttpDelete]
     [Authorize(Roles = "Admin")]
     [Route(nameof(DeleteSubject))]
-    public async Task DeleteSubject(Guid subjectId) => await _subjectService.DeleteSubjectAsync(subjectId);
+    public async Task<ResultRequestDTO<string>> DeleteSubject(Guid subjectId) => await _subjectService.DeleteSubjectAsync(subjectId);
 }

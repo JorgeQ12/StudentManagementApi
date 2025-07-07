@@ -13,6 +13,12 @@ public class AuthRepository : IAuthRepository
         _generic = generic;
     }
 
+    /// <summary>
+    /// Registrar estudiante y usuario login - General
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="student"></param>
+    /// <returns></returns>
     public async Task RegisterNewStudentAsync(User user, Student student)
     {
         await _generic.ExecuteProcedureAsync("SP_RegisterStudentAndUser", new
@@ -37,6 +43,11 @@ public class AuthRepository : IAuthRepository
         });
     }
 
+    /// <summary>
+    /// Autenticacion - General
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
     public async Task<User?> FindUserByUsernameAsync(string username)
     {
         return await _generic.GetProcedureSingleAsync<User>("SP_GetUserByUsername", new

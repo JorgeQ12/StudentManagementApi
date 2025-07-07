@@ -7,9 +7,10 @@ namespace Application.Interfaces.IRepository;
 public interface ISubjectRepository
 {
     /// <summary>
-    /// Trae todas las materias registradas
+    /// Trae todas las materias registradas - Panel Admin y Estudiante
     /// </summary>
-    Task<IEnumerable<SubjectResponseDTO>> GetAllSubjectsAsync();
+    /// <returns></returns>
+    Task<IEnumerable<SubjectWithProfessorDTO>> GetAllSubjectsAsync();
 
     /// <summary>
     /// Trae una materia por su ID
@@ -22,22 +23,21 @@ public interface ISubjectRepository
     Task<IEnumerable<Guid>> GetSubjectIdsByStudentAsync(Guid studentId);
 
     /// <summary>
-    /// Obtiene las materias completas a partir de una lista de IDs
+    /// Obtiene las materias completas a partir de una lista de IDs 
     /// </summary>
     Task<IEnumerable<Subject>> GetSubjectsByIdsAsync(IEnumerable<Guid> subjectIds);
 
     /// <summary>
-    /// Obtiene todas las materias inscritas por un estudiante
+    /// Registra una nueva materia - Panel Admin
     /// </summary>
-    Task<IEnumerable<SubjectWithProfessorDTO>> GetSubjectsByStudentIdAsync(Guid studentId);
-
-    /// <summary>
-    /// Registra una nueva materia
-    /// </summary>
+    /// <param name="subject"></param>
+    /// <returns></returns>
     Task CreateSubjectAsync(Subject subject);
 
     /// <summary>
-    /// Elimina una materia por su ID
+    /// Elimina una materia por su ID - Panel Admin
     /// </summary>
+    /// <param name="subjectId"></param>
+    /// <returns></returns>
     Task DeleteSubjectAsync(Guid subjectId);
 }

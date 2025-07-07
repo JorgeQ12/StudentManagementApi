@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Auth;
+using Application.DTOs.Common;
 using Application.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,12 +16,23 @@ namespace StudentManagementApi.Controllers
             _authService = authService;
         }
 
+        /// <summary>
+        /// Registrar estudiante y usuario login - General
+        /// </summary>
+        /// <param name="registerRequest"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route(nameof(AuthController.RegisterStudentAsync))]
-        public async Task RegisterStudentAsync([FromBody] RegisterRequestDTO registerStudent) => await _authService.RegisterStudentAsync(registerStudent);
+        public async Task<ResultRequestDTO<string>> RegisterStudentAsync([FromBody] RegisterRequestDTO registerRequest) => await _authService.RegisterStudentAsync(registerRequest);
+
+        /// <summary>
+        /// Autenticacion - General
+        /// </summary>
+        /// <param name="loginRequest"></param>
+        /// <returns></returns>
 
         [HttpPost]
         [Route(nameof(AuthController.AuthenticateAsync))]
-        public async Task<string> AuthenticateAsync([FromBody] LoginRequestDTO request) => await _authService.AuthenticateAsync(request.Username, request.Password);
+        public async Task<ResultRequestDTO<string>> AuthenticateAsync([FromBody] LoginRequestDTO loginRequest) => await _authService.AuthenticateAsync(loginRequest);
     }
 }

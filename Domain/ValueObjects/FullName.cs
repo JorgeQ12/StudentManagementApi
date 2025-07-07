@@ -1,4 +1,7 @@
 ﻿
+using Domain.Exceptions;
+using System.Text.Json.Serialization;
+
 namespace Domain.ValueObjects
 {
     public sealed class FullName
@@ -8,13 +11,14 @@ namespace Domain.ValueObjects
         public string LastName { get; }
         public string? SecondLastName { get; }
 
+        [JsonConstructor]
         public FullName(string firstName, string? middleName, string lastName, string? secondLastName)
         {
             if (string.IsNullOrWhiteSpace(firstName))
-                throw new ArgumentException("First name is required.", nameof(firstName));
+                throw new DomainException("First name is required.");
 
             if (string.IsNullOrWhiteSpace(lastName))
-                throw new ArgumentException("The first surname is required", nameof(lastName));
+                throw new DomainException("The first surname is required");
 
             FirstName = firstName.Trim();
             MiddleName = middleName?.Trim();

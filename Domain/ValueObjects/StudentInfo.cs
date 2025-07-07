@@ -1,4 +1,5 @@
 ﻿using Domain.Exceptions;
+using System.Text.Json.Serialization;
 
 namespace Domain.ValueObjects
 {
@@ -14,6 +15,7 @@ namespace Domain.ValueObjects
         public DateTime EnrollmentDate { get; }
         public bool IsActive { get; }
 
+        [JsonConstructor]
         public StudentInfo(string email, string documentType, string documentNumber, string phoneNumber, DateTime birthDate, string gender, string address, DateTime? enrollmentDate = null, bool isActive = true)
         {
             if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))

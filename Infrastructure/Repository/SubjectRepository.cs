@@ -15,11 +15,18 @@ public class SubjectRepository : ISubjectRepository
         _generic = generic;
     }
 
-    public async Task<IEnumerable<SubjectResponseDTO>> GetAllSubjectsAsync()
+    /// <summary>
+    /// Trae todas las materias registradas - Panel Admin y Estudiante
+    /// </summary>
+    /// <returns></returns>
+    public async Task<IEnumerable<SubjectWithProfessorDTO>> GetAllSubjectsAsync()
     {
-        return await _generic.GetProcedureAsync<SubjectResponseDTO>("SP_GetAllSubjects", new { });
+        return await _generic.GetProcedureAsync<SubjectWithProfessorDTO>("SP_GetAllSubjects", new { });
     }
 
+    /// <summary>
+    /// Trae una materia por su ID
+    /// </summary>
     public async Task<SubjectResponseDTO?> GetSubjectByIdAsync(Guid subjectId)
     {
         return await _generic.GetProcedureSingleAsync<SubjectResponseDTO>("SP_GetSubjectById", new
@@ -28,23 +35,33 @@ public class SubjectRepository : ISubjectRepository
         });
     }
 
+    /// <summary>
+    /// Obtiene los IDs de materias inscritas por un estudiante
+    /// </summary>
     public async Task<IEnumerable<Guid>> GetSubjectIdsByStudentAsync(Guid studentId)
     {
-        var result = await _generic.GetProcedureAsync<object>( "SP_GetSubjectIdsByStudent", new { StudentId = studentId });
-        return result.Select(x => (Guid)x.GetType().GetProperty("SubjectId")!.GetValue(x)!);
+        var result = await _generic.GetProcedureAsync<dynamic>(
+            "SP_GetSubjectIdsByStudent",
+            new { StudentId = studentId }
+        );
+
+        return result.Select(x => (Guid)x.SubjectId);
     }
 
+    /// <summary>
+    /// Obtiene las materias completas a partir de una lista de IDs 
+    /// </summary>
     public async Task<IEnumerable<Subject>> GetSubjectsByIdsAsync(IEnumerable<Guid> subjectIds)
     {
         var ids = string.Join(",", subjectIds);
         return await _generic.GetProcedureAsync<Subject>("SP_GetSubjectsByIds", new { Ids = ids });
     }
-
-    public async Task<IEnumerable<SubjectWithProfessorDTO>> GetSubjectsByStudentIdAsync(Guid studentId)
-    {
-        return await _generic.GetProcedureAsync<SubjectWithProfessorDTO>("SP_GetSubjectsByStudentId", new { StudentId = studentId });
-    }
-
+   
+    /// <summary>
+    /// Registra una nueva materia - Panel Admin
+    /// </summary>
+    /// <param name="subject"></param>
+    /// <returns></returns>
     public async Task CreateSubjectAsync(Subject subject)
     {
         await _generic.ExecuteProcedureAsync("SP_CreateSubject", new
@@ -55,6 +72,11 @@ public class SubjectRepository : ISubjectRepository
         });
     }
 
+    /// <summary>
+    /// Elimina una materia por su ID - Panel Admin
+    /// </summary>
+    /// <param name="subjectId"></param>
+    /// <returns></returns>
     public async Task DeleteSubjectAsync(Guid subjectId)
     {
         await _generic.ExecuteProcedureAsync("SP_DeleteSubject", new { SubjectId = subjectId });

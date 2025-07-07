@@ -26,13 +26,15 @@ public class Student
 
     public void EnrollInSubjects(IEnumerable<Subject> subjects)
     {
-        if (subjects.Count() != 3)
-            throw new DomainException("Student must be enrolled in exactly 3 subjects.");
+        var subjectList = subjects.ToList();
 
-        var distinctProfessors = subjects.Select(s => s.ProfessorId).Distinct().Count();
-        if (distinctProfessors != 3)
-            throw new DomainException("Subjects must be taught by different professors.");
+        if (subjectList.Count is < 1 or > 3)
+            throw new DomainException("Student must be enrolled in 1 to 3 subjects.");
 
-        _subjects = subjects;
+        var distinctProfessors = subjectList.Select(s => s.ProfessorId).Distinct().Count();
+        if (distinctProfessors != subjectList.Count)
+            throw new DomainException("Each subject must have a different professor.");
+
+        _subjects = subjectList;
     }
 }

@@ -2,6 +2,7 @@
 
 public class UpdateStudentRequestDTO
 {
+    public Guid Id { get; set; }
     public string Email { get; set; } = string.Empty;
     public string DocumentType { get; set; } = string.Empty;
     public string DocumentNumber { get; set; } = string.Empty;

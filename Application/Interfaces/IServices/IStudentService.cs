@@ -1,32 +1,67 @@
 ﻿using Application.DTOs.Student;
 using Application.DTOs;
+using Application.DTOs.Common;
+using Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Interfaces.IServices;
 
 public interface IStudentService
 {
     /// <summary>
-    /// Obtener el perfil del estudiante
+    /// Obtener todos los estudiantes - Panel Admin y Estudiante
     /// </summary>
-    Task<StudentProfileDTO> GetStudentProfileAsync(Guid studentId);
+    /// <returns></returns>
+    Task<ResultRequestDTO<IEnumerable<StudentProfileDTO>>> GetAllStudents();
 
     /// <summary>
-    /// Actualizar los datos personales del estudiante
+    /// Obtener información personal del estudiante - Panel Estudiante
     /// </summary>
-    Task UpdateStudentProfileAsync(Guid studentId, UpdateStudentRequestDTO request);
+    /// <param name="studentId"></param>
+    /// <returns></returns>
+    Task<ResultRequestDTO<StudentProfileDTO>> GetStudentProfileAsync(Guid studentId);
 
     /// <summary>
-    /// Inscribir al estudiante en exactamente 3 materias con profesores distintos
+    /// lista de estudiantes junto con las materias en las que están inscritos - Panel Estudiante
     /// </summary>
-    Task EnrollStudentInSubjectsAsync(Guid studentId, IEnumerable<Guid> subjectIds);
+    /// <returns></returns>
+    Task<ResultRequestDTO<IEnumerable<StudentsWithSubjectsDTO>>> GetAllStudentsWithSubjectsAsync();
 
     /// <summary>
-    /// Obtener las materias en las que el estudiante está inscrito
+    /// Obtener detalle de cada clase registrada por el estudiante - Panel Estudiante
     /// </summary>
-    Task<IEnumerable<SubjectWithProfessorDTO>> GetSubjectsEnrolledByStudentAsync(Guid studentId);
+    /// <param name="studentId"></param>
+    /// <returns></returns>
+    Task<ResultRequestDTO<IEnumerable<StudentClassDetailsDTO>>> GetStudentClassDetailsAsync(Guid studentId);
 
     /// <summary>
-    /// Obtener los compañeros agrupados por cada materia compartida
+    /// Inscribir materias - Panel Estudiante
     /// </summary>
-    Task<IEnumerable<ClassmatesBySubjectDTO>> GetClassmatesGroupedBySubjectAsync(Guid studentId);
+    /// <param name="studentId"></param>
+    /// <param name="subjectIds"></param>
+    /// <returns></returns>
+    Task<ResultRequestDTO<string>> EnrollStudentInSubjectsAsync(Guid studentId, IEnumerable<Guid> subjectIds);
+
+    /// <summary>
+    /// Actualizar información personal del estudiante - Panel Estudiante
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    Task<ResultRequestDTO<string>> UpdateStudentProfileAsync(UpdateStudentRequestDTO request);
+
+    /// <summary>
+    /// Eliminar materia registrada por usuario - Panel Estudiante
+    /// </summary>
+    /// <param name="studentId"></param>
+    /// <param name="subjectId"></param>
+    /// <returns></returns>
+    Task<ResultRequestDTO<string>> DeleteEnrollInSubjects(Guid studentId, Guid subjectId);
+
+    /// <summary>
+    /// Eliminar el perfil del estudiante registrado - Panel Admin
+    /// </summary>
+    /// <param name="studentId"></param>
+    /// <returns></returns>
+    Task<ResultRequestDTO<string>> DeleteStudentProfile(Guid studentId);
 }

@@ -4,6 +4,9 @@ using Domain.Entities;
 using Domain.Exceptions;
 using Application.DTOs.Auth;
 using Domain.Interface.IAuth;
+using Application.DTOs.Common;
+using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace Application.Services;
 
@@ -12,63 +15,86 @@ public class AuthService : IAuthService
     private readonly IAuthRepository _authRepository;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IAuthRepository authRepository, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator)
+    public AuthService(IAuthRepository authRepository, IPasswordHasher passwordHasher, IJwtTokenGenerator jwtTokenGenerator, ILogger<AuthService> logger)
     {
         _authRepository = authRepository;
         _passwordHasher = passwordHasher;
         _jwtTokenGenerator = jwtTokenGenerator;
+        _logger = logger;
     }
 
-    public async Task RegisterStudentAsync(RegisterRequestDTO request)
+    /// <summary>
+    /// Registrar estudiante y usuario login - General
+    /// </summary>
+    /// <param name="registerRequest"></param>
+    /// <returns></returns>
+    public async Task<ResultRequestDTO<string>> RegisterStudentAsync(RegisterRequestDTO registerRequest)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+            if (string.IsNullOrWhiteSpace(registerRequest.Username) || string.IsNullOrWhiteSpace(registerRequest.Password))
                 throw new DomainException("Username and password are required.");
 
-            var student = new Student(Guid.NewGuid(), request.FullName, request.Info);
+            var student = new Student(Guid.NewGuid(), registerRequest.FullName, registerRequest.Info);
 
-            var hashedPassword = _passwordHasher.Hash(request.Password);
+            var hashedPassword = _passwordHasher.Hash(registerRequest.Password);
 
             var user = new User(
                 id: Guid.NewGuid(),
-                username: request.Username,
+                username: registerRequest.Username,
                 passwordHash: hashedPassword,
                 role: "Student",
                 studentId: student.Id
             );
 
             await _authRepository.RegisterNewStudentAsync(user, student);
+
+            return ResultRequestDTO<string>.Success("Student created successfully");
         }
-        catch (DomainException)
+        catch (DomainException exDomain)
         {
+            _logger.LogError(exDomain, "Error occurred during student registration.");
             throw;
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An unexpected error occurred during student registration.", ex);
+            _logger.LogError(ex, "Error occurred during student registration.");
+            throw;
         }
     }
 
-    public async Task<string> AuthenticateAsync(string username, string password)
+    /// <summary>
+    /// Autenticacion - General
+    /// </summary>
+    /// <param name="loginRequest"></param>
+    /// <returns></returns>
+    public async Task<ResultRequestDTO<string>> AuthenticateAsync(LoginRequestDTO loginRequest)
     {
         try
         {
-            var user = await _authRepository.FindUserByUsernameAsync(username) ?? throw new DomainException("Invalid username or password.");
+            if (string.IsNullOrWhiteSpace(loginRequest.Username) || string.IsNullOrWhiteSpace(loginRequest.Password))
+                return ResultRequestDTO<string>.Failure("Username and password are required.");
 
-            if (!_passwordHasher.Verify(user.PasswordHash, password))
-                throw new DomainException("Invalid username or password.");
+            var user = await _authRepository.FindUserByUsernameAsync(loginRequest.Username);
+            if (user is null || !_passwordHasher.Verify(user.PasswordHash, loginRequest.Password))
+                return ResultRequestDTO<string>.Failure("Invalid username or password.");
 
-            return _jwtTokenGenerator.GenerateToken(user);
+            if (!_passwordHasher.Verify(user.PasswordHash, loginRequest.Password))
+                return ResultRequestDTO<string>.Failure("Invalid username or password.");
+
+            return ResultRequestDTO<string>.Success(_jwtTokenGenerator.GenerateToken(user));
         }
-        catch (DomainException)
+        catch (DomainException exDomain)
         {
+            _logger.LogError(exDomain, "Error authenticating user: {Username}", loginRequest.Username);
             throw;
         }
         catch (Exception ex)
         {
-            throw new ApplicationException("An unexpected error occurred during authentication.", ex);
+            _logger.LogError(ex, "Error authenticating user: {Username}", loginRequest.Username);
+            throw;
         }
     }
 }
