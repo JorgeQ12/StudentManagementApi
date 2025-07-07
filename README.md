@@ -15,7 +15,7 @@ Esta es la API que respalda el sistema de gestión de estudiantes. Fue desarroll
 ---
 
 ## Estructura del Proyecto
-
+```
 StudentManagementApi.sln
 │
 ├── Application/ → Lógica de negocio 
@@ -40,7 +40,7 @@ StudentManagementApi.sln
 ├── Middleware/ → Middlewares personalizados
 ├── appsettings.json → Configuración de entorno
 └── Program.cs → Bootstrap principal de la aplicación
-
+```
 ##  Cómo ejecutar localmente
 
 git clone https://github.com/tu-usuario/student-management-api.git
